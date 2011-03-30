@@ -166,9 +166,17 @@ class Timesheet
                 "#{l(:label_issue)} #{l(:field_subject)}",
                 l(:field_comments)
                ]
+        
+    proj_fields = ProjectCustomField.find(:all)
+    if (proj_fields)
+      proj_fields.each do |value|
+        csv_data << value.name
+      end
+    end
+    
     time_entry_header = TimeEntry.new
     time_entry_header.custom_field_values.each do |value|
-    csv_data << value.custom_field.name
+      csv_data << value.custom_field.name
     end
 
     csv_data << l(:field_hours)
@@ -188,10 +196,18 @@ class Timesheet
                 (time_entry.issue.subject if time_entry.issue),
                 time_entry.comments
                ]
+    
+    proj_fields = ProjectCustomField.find(:all)
+    if (proj_fields)
+      p = time_entry.project
+      proj_fields.each do |value|
+        csv_data << p.custom_value_for(value.id) || " "
+      end
+    end
 
-    custom_fields_helper = Object.new.extend(CustomFieldsHelper)
+    custom_fields_helper = Object.new.extend(CustomFieldsHelper)        
     time_entry.custom_field_values.each do |value|
-    csv_data << custom_fields_helper.show_value(value)
+      csv_data << custom_fields_helper.show_value(value)
     end
 
     csv_data << time_entry.hours

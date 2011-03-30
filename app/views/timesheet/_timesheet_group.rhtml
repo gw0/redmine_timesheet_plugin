@@ -8,6 +8,13 @@
     <th width="10%"><%= l(:label_member) %></th>
     <th width="15%"><%= l(:label_activity) %></th>
     <th width="15%"><%= l(:label_project) %></th>
+    <%@proj_fields = ProjectCustomField.find(:all)
+      if (@proj_fields)
+      @proj_fields.each do |pval| %>
+        <th width="10%"><%= pval.name %></th>
+      <%  end %>
+    <% end %>
+    
     <th width="10%"><%= l(:label_issue) %></th>
     <th width="25%"><%= l(:field_comments) %></th>
     <% time_entry = TimeEntry.new

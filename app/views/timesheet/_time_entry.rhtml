@@ -5,6 +5,17 @@
     <td align="center"><%= time_entry.user.name %></td>
     <td align="center"><%= time_entry.activity.name %></td>
     <td align="center"><%= time_entry.project.name %></td>
+    
+    <%
+    if (@proj_fields)
+      p = time_entry.project
+      @proj_fields.each do |pval|
+          pf = p.custom_value_for(pval.id) || "&nbsp;"
+          %>
+          <td><%= pf %></td>
+      <% end %>
+    <% end %>
+    
     <td align="center">
       <% if time_entry.issue %>
       <div class="tooltip">
