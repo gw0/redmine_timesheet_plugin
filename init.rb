@@ -11,6 +11,10 @@ end
 require 'dispatcher'
 Dispatcher.to_prepare :timesheet_plugin do
 
+  require_dependency 'principal'
+  require_dependency 'user'
+  User.send(:include, TimesheetPlugin::Patches::UserPatch)
+
   require_dependency 'project'
   Project.send(:include, TimesheetPlugin::Patches::ProjectPatch)
   # Needed for the compatibility check
@@ -33,7 +37,12 @@ unless Redmine::Plugin.registered_plugins.keys.include?(:timesheet_plugin)
     version '0.6.0'
     requires_redmine :version_or_higher => '0.9.0'
     
-    settings :default => {'list_size' => '5', 'precision' => '2', 'project_status' => 'active'}, :partial => 'settings/timesheet_settings'
+    settings(:default => {
+               'list_size' => '5',
+               'precision' => '2',
+               'project_status' => 'active',
+               'user_status' => 'active'
+             }, :partial => 'settings/timesheet_settings')
 
     permission :see_project_timesheets, { }, :require => :member
 

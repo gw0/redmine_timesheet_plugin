@@ -31,7 +31,14 @@ class Timesheet
     self.custom_field_values = options[:custom_field_values] || [ ]
 
     unless options[:activities].nil?
-      self.activities = options[:activities].collect { |a| a.to_i }
+      self.activities = options[:activities].collect do |activity_id|
+        # Include project-overridden activities
+        activity = TimeEntryActivity.find(activity_id)
+        project_activities = TimeEntryActivity.all(:conditions => ['parent_id IN (?)', activity.id]) if activity.parent_id.nil?
+        project_activities ||= []
+        
+        [activity.id.to_i] + project_activities.collect(&:id)
+      end.flatten.uniq.compact
     else
       self.activities =  TimeEntryActivity.all.collect { |a| a.id.to_i }
     end
@@ -148,7 +155,13 @@ class Timesheet
   end
 
   def self.viewable_users
-    User.active.select {|user|
+    if Setting['plugin_timesheet_plugin'].present? && Setting['plugin_timesheet_plugin']['user_status'] == 'all'
+      user_scope = User.all
+    else
+      user_scope = User.active
+    end
+    
+    user_scope.select {|user|
       user.allowed_to?(:log_time, nil, :global => true)
     }
   end
@@ -317,11 +330,11 @@ class Timesheet
         # Administrators can see all time entries
         logs = time_entries_for_all_users(project)
         users = logs.collect(&:user).uniq.sort
-      elsif User.current.allowed_to?(:see_project_timesheets, project)
+      elsif User.current.allowed_to_on_single_potentially_archived_project?(:see_project_timesheets, project)
         # Users with the Role and correct permission can see all time entries
         logs = time_entries_for_all_users(project)
         users = logs.collect(&:user).uniq.sort
-      elsif User.current.allowed_to?(:view_time_entries, project)
+      elsif User.current.allowed_to_on_single_potentially_archived_project?(:view_time_entries, project)
         # Users with permission to see their time entries
         logs = time_entries_for_current_user(project)
         users = logs.collect(&:user).uniq.sort
@@ -351,7 +364,7 @@ class Timesheet
       elsif User.current.id == user_id
         # Users can see their own their time entries
         logs = time_entries_for_user(user_id)
-      elsif User.current.allowed_to?(:see_project_timesheets, nil, :global => true)
+      elsif User.current.allowed_to_on_single_potentially_archived_project?(:see_project_timesheets, nil, :global => true)
         # User can see project timesheets in at least once place, so
         # fetch the user timelogs for those projects
         logs = time_entries_for_user(user_id, :conditions => Project.allowed_to_condition(User.current, :see_project_timesheets))
@@ -380,10 +393,10 @@ class Timesheet
         if User.current.admin?
           # Administrators can see all time entries
           logs << issue_time_entries_for_all_users(issue)
-        elsif User.current.allowed_to?(:see_project_timesheets, project)
+        elsif User.current.allowed_to_on_single_potentially_archived_project?(:see_project_timesheets, project)
           # Users with the Role and correct permission can see all time entries
           logs << issue_time_entries_for_all_users(issue)
-        elsif User.current.allowed_to?(:view_time_entries, project)
+        elsif User.current.allowed_to_on_single_potentially_archived_project?(:view_time_entries, project)
           # Users with permission to see their time entries
           logs << issue_time_entries_for_current_user(issue)
         else
