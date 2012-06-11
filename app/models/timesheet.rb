@@ -169,61 +169,108 @@ class Timesheet
   protected
 
   def csv_header
+    proj_fields = ProjectCustomField.find(:all)
+
     csv_data = [
                 '#',
                 l(:label_date),
+                l(:label_month),
                 l(:label_member),
-                l(:label_activity),
-                l(:label_project),
-                l(:label_issue),
-                "#{l(:label_issue)} #{l(:field_subject)}",
-                l(:field_comments)
-               ]
-        
-    proj_fields = ProjectCustomField.find(:all)
+    		l(:field_hours)
+    ];
+
     if (proj_fields)
       proj_fields.each do |value|
-        csv_data << value.name
+	if value.name=='Category'
+          csv_data << value.name
+	end	
+      end
+    end
+
+    csv_data.concat [
+                l(:label_project),
+	        'Task',	
+                l(:label_issue),
+                "#{l(:label_issue)} #{l(:field_subject)}",
+                l(:field_comments),
+                l(:label_activity)
+               ]
+        
+
+    if (proj_fields)
+      proj_fields.each do |value|
+	if ( value.name!='Category') && ( value.name!='Worklog')
+          csv_data << value.name
+	end	
       end
     end
     
     time_entry_header = TimeEntry.new
     time_entry_header.custom_field_values.each do |value|
-      csv_data << value.custom_field.name
+	unless value.custom_field.name=='Worklog'
+      		csv_data << value.custom_field.name
+	end
     end
 
-    csv_data << l(:field_hours)
 
     Redmine::Hook.call_hook(:plugin_timesheet_model_timesheet_csv_header, { :timesheet => self, :csv_data => csv_data})
     return csv_data
   end
 
   def time_entry_to_csv(time_entry)
+    proj_fields = ProjectCustomField.find(:all)
+    custom_fields_helper = Object.new.extend(CustomFieldsHelper)        
     csv_data = [
                 time_entry.id,
-                time_entry.spent_on,
+                time_entry.spent_on.strftime( "%d.%m.%Y" ),
+                time_entry.spent_on.month,
                 time_entry.user.name,
-                time_entry.activity.name,
-                time_entry.project.name,
-                ("#{time_entry.issue.tracker.name} ##{time_entry.issue.id}" if time_entry.issue),
-                (time_entry.issue.subject if time_entry.issue),
-                time_entry.comments
-               ]
-    
-    proj_fields = ProjectCustomField.find(:all)
+     		time_entry.hours
+   ];
+
     if (proj_fields)
       p = time_entry.project
       proj_fields.each do |value|
-        csv_data << p.custom_value_for(value.id) || " "
+	if value.name=='Category'
+        	csv_data << p.custom_value_for(value.id) || " "
+	end
       end
     end
 
-    custom_fields_helper = Object.new.extend(CustomFieldsHelper)        
+    csv_data.concat [
+                time_entry.project.name,
+		("#{time_entry.issue.tracker.name} ##{time_entry.issue.id}" if time_entry.issue )+':'+(time_entry.issue.subject if time_entry.issue) ,
+                ("#{time_entry.issue.tracker.name} ##{time_entry.issue.id}" if time_entry.issue),
+                (time_entry.issue.subject if time_entry.issue)
+               ]
+
+   comment=time_entry.comments
+
     time_entry.custom_field_values.each do |value|
-      csv_data << custom_fields_helper.show_value(value)
+	if  value.custom_field.name=='Worklog'
+      		comment.concat "\n" +  custom_fields_helper.show_value(value)
+	end
     end
 
-    csv_data << time_entry.hours
+   csv_data << comment
+   csv_data << time_entry.activity.name 
+
+    if (proj_fields)
+      p = time_entry.project
+      proj_fields.each do |value|
+	unless  value.name='Category'
+        	csv_data << p.custom_value_for(value.id) || " "
+	end
+      end
+    end
+
+
+    time_entry.custom_field_values.each do |value|
+	unless value.custom_field.name=='Worklog'
+      		csv_data << custom_fields_helper.show_value(value)
+	end
+    end
+
     Redmine::Hook.call_hook(:plugin_timesheet_model_timesheet_time_entry_to_csv, { :timesheet => self, :time_entry => time_entry, :csv_data => csv_data})
     return csv_data
   end
