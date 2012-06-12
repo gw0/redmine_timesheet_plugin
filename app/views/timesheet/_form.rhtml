@@ -41,6 +41,12 @@
   <%= select_tag 'timesheet[users][]', user_options(@timesheet), { :multiple => true, :size => @list_size} %>
 </p>
 
+<% 
+project=Project.new
+project.custom_field_values = @timesheet.project_custom_field_values unless @timesheet.project_custom_field_values.empty?
+project.custom_field_values.each do |value| %>
+<p><%= custom_field_tag_with_label :project, value %></p>
+<% end %>
 
 <% time_entry = TimeEntry.new
 time_entry.custom_field_values = @timesheet.custom_field_values unless @timesheet.custom_field_values.empty?

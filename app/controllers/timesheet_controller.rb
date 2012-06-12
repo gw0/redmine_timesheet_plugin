@@ -33,6 +33,9 @@ class TimesheetController < ApplicationController
 
   def report
     if params && params[:timesheet]
+      if params[:project]
+	 params[:timesheet][:project_custom_field_values]=params[:project][:custom_field_values]
+      end 
       @timesheet = Timesheet.new( params[:timesheet] )
     else
       redirect_to :action => 'index'

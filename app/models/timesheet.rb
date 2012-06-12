@@ -1,5 +1,5 @@
 class Timesheet
-  attr_accessor :date_from, :date_to, :projects, :activities, :users, :allowed_projects, :period, :period_type, :custom_field_values
+  attr_accessor :date_from, :date_to, :projects, :activities, :users, :allowed_projects, :period, :period_type, :custom_field_values, :project_custom_field_values
 
   # Time entries on the Timesheet in the form of:
   #   project.name => {:logs => [time entries], :users => [users shown in logs] }
@@ -29,6 +29,7 @@ class Timesheet
     self.potential_time_entry_ids = options[:potential_time_entry_ids] || [ ]
     self.allowed_projects = options[:allowed_projects] || [ ]
     self.custom_field_values = options[:custom_field_values] || [ ]
+    self.project_custom_field_values = options[:project_custom_field_values] || [ ]
 
     unless options[:activities].nil?
       self.activities = options[:activities].collect do |activity_id|
@@ -124,6 +125,7 @@ class Timesheet
       :activities => activities,
       :users => users,
       :custom_field_values => custom_field_values,
+      :project_custom_field_values => project_custom_field_values,
       :sort => sort
     }
   end
@@ -275,6 +277,18 @@ class Timesheet
     return csv_data
   end
 
+  def project_ids (projects)
+      custom_field_project_conditions="TRUE"
+      self.project_custom_field_values.each do |value|
+        custom_field_project_conditions << " AND #{CustomValue.table_name}.custom_field_id = #{value[0]} AND #{CustomValue.table_name}.value = '#{value[1]}'" unless value[1].empty?
+      end
+      ids=( Project.find(:all,
+	:conditions=>custom_field_project_conditions,
+	:include =>[:custom_values]
+      ).collect {|p| p.id} ) & (Project.find(:all).collect {|p| p.id})
+      return ids
+  end
+
   # Array of users to find
   # String of extra conditions to add onto the query (AND)
   def conditions(users, extra_conditions=nil)
@@ -291,14 +305,14 @@ class Timesheet
                       {
                         :from => self.date_from,
                         :to => self.date_to,
-                        :projects => self.projects,
+                        :projects => self.project_ids(self.projects),
                         :activities => self.activities,
                         :users => users
                       }]
       else # All time
         conditions = ["#{TimeEntry.table_name}.project_id IN (:projects) AND user_id IN (:users) AND (activity_id IN (:activities) OR (#{::Enumeration.table_name}.parent_id IN (:activities) AND #{::Enumeration.table_name}.project_id IN (:projects))) #{custom_field_conditions}",
                       {
-                        :projects => self.projects,
+                        :projects => self.project_ids(self.projects),
                         :activities => self.activities,
                         :users => users
                       }]
