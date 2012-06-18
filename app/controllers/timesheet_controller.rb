@@ -16,7 +16,9 @@ class TimesheetController < ApplicationController
 
   SessionKey = 'timesheet_filter'
 
-  verify :method => :delete, :only => :reset, :render => {:nothing => true, :status => :method_not_allowed }
+  if Rails::VERSION::MAJOR < 3
+  	verify :method => :delete, :only => :reset, :render => {:nothing => true, :status => :method_not_allowed }
+  end 
 
   def index
     load_filters_from_session
@@ -124,13 +126,14 @@ class TimesheetController < ApplicationController
   end
 
   def allowed_projects
-    if User.current.admin? && Setting.plugin_timesheet_plugin['project_status'] == 'all'
-      Project.timesheet_order_by_name
-    elsif Setting.plugin_timesheet_plugin['project_status'] == 'all'
-      Project.timesheet_order_by_name.timesheet_with_membership(User.current)
-    else
-      Project.timesheet_order_by_name.all(:conditions => Project.visible_condition(User.current))
-    end
+	Project.timesheet_order_by_name
+#    if User.current.admin? && Setting.plugin_timesheet_plugin['project_status'] == 'all'
+#      Project.timesheet_order_by_name
+#    elsif Setting.plugin_timesheet_plugin['project_status'] == 'all'
+#      Project.timesheet_order_by_name.timesheet_with_membership(User.current)
+#    else
+#      Project.timesheet_order_by_name.all(:conditions => Project.visible_condition(User.current))
+#    end
   end
 
   def clear_filters_from_session

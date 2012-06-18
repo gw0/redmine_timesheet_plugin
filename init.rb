@@ -1,4 +1,5 @@
 require 'redmine'
+require 'dispatcher' unless Rails::VERSION::MAJOR >= 3
 
 # Taken from lib/redmine.rb
 if RUBY_VERSION < '1.9'
@@ -7,24 +8,6 @@ else
   require 'csv'
   FCSV = CSV
 end
-
-require 'dispatcher'
-Dispatcher.to_prepare :timesheet_plugin do
-
-  require_dependency 'principal'
-  require_dependency 'user'
-  User.send(:include, TimesheetPlugin::Patches::UserPatch)
-
-  require_dependency 'project'
-  Project.send(:include, TimesheetPlugin::Patches::ProjectPatch)
-  # Needed for the compatibility check
-  begin
-    require_dependency 'time_entry_activity'
-  rescue LoadError
-    # TimeEntryActivity is not available
-  end
-end
-
 
 unless Redmine::Plugin.registered_plugins.keys.include?(:timesheet_plugin)
   Redmine::Plugin.register :timesheet_plugin do
@@ -35,7 +18,7 @@ unless Redmine::Plugin.registered_plugins.keys.include?(:timesheet_plugin)
     author_url 'http://www.littlestreamsoftware.com'
 
     version '0.6.0'
-    requires_redmine :version_or_higher => '0.9.0'
+    requires_redmine :version_or_higher => '2.0.0'
     
     settings(:default => {
                'list_size' => '5',
@@ -58,3 +41,36 @@ unless Redmine::Plugin.registered_plugins.keys.include?(:timesheet_plugin)
 
   end
 end
+
+if Rails::VERSION::MAJOR >= 3
+  ActionDispatch::Callbacks.to_prepare do
+  require_dependency 'principal'
+  require_dependency 'user'
+  User.send(:include, TimesheetPlugin::Patches::UserPatch)
+
+  require_dependency 'project'
+  Project.send(:include, TimesheetPlugin::Patches::ProjectPatch)
+  # Needed for the compatibility check
+  begin
+    require_dependency 'time_entry_activity'
+  rescue LoadError
+    # TimeEntryActivity is not available
+  end
+  end
+else
+  Dispatcher.to_prepare PreviewAttachColumn::PLUGIN_NAME do
+  require_dependency 'principal'
+  require_dependency 'user'
+  User.send(:include, TimesheetPlugin::Patches::UserPatch)
+
+  require_dependency 'project'
+  Project.send(:include, TimesheetPlugin::Patches::ProjectPatch)
+  # Needed for the compatibility check
+  begin
+    require_dependency 'time_entry_activity'
+  rescue LoadError
+    # TimeEntryActivity is not available
+  end
+  end
+end
+

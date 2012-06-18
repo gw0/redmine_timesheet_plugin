@@ -1,4 +1,9 @@
 class Timesheet
+#include ActiveModel::AttributeMethods
+#include ActiveModel::Conversion
+#include ActiveModel::Validations  
+#extend ActiveModel::Naming
+
   attr_accessor :date_from, :date_to, :projects, :activities, :users, :allowed_projects, :period, :period_type, :custom_field_values, :project_custom_field_values
 
   # Time entries on the Timesheet in the form of:
@@ -486,7 +491,11 @@ class Timesheet
   end
 
 
-  def l(*args)
-    I18n.t(*args)
+  def persisted?
+	false
   end
+
+#  def l(*args)
+#    I18n.t(*args)
+#  end
 end
