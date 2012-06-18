@@ -1,9 +1,5 @@
 class Timesheet
-#include ActiveModel::AttributeMethods
-#include ActiveModel::Conversion
-#include ActiveModel::Validations  
-#extend ActiveModel::Naming
-
+  include ActionView::Helpers::TranslationHelper
   attr_accessor :date_from, :date_to, :projects, :activities, :users, :allowed_projects, :period, :period_type, :custom_field_values, :project_custom_field_values
 
   # Time entries on the Timesheet in the form of:
@@ -136,7 +132,7 @@ class Timesheet
   end
 
   def to_csv
-    returning '' do |out|
+    ''.tap do |out|
       FCSV.generate out do |csv|
         csv << csv_header
 
@@ -180,10 +176,10 @@ class Timesheet
 
     csv_data = [
                 '#',
-                l(:label_date),
-                l(:label_month),
-                l(:label_member),
-    		l(:field_hours)
+                t(:label_date),
+                t(:label_month),
+                t(:label_member),
+    		t(:field_hours)
     ];
 
     if (proj_fields)
@@ -195,12 +191,12 @@ class Timesheet
     end
 
     csv_data.concat [
-                l(:label_project),
+                t(:label_project),
 	        'Task',	
-                l(:label_issue),
-                "#{l(:label_issue)} #{l(:field_subject)}",
-                l(:field_comments),
-                l(:label_activity)
+                t(:label_issue),
+                "#{t(:label_issue)} #{t(:field_subject)}",
+                t(:field_comments),
+                t(:label_activity)
                ]
         
 

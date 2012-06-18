@@ -39,6 +39,7 @@ class TimesheetController < ApplicationController
 	 params[:timesheet][:project_custom_field_values]=params[:project][:custom_field_values]
       end 
       @timesheet = Timesheet.new( params[:timesheet] )
+      p @timesheet
     else
       redirect_to :action => 'index'
       return
@@ -126,14 +127,13 @@ class TimesheetController < ApplicationController
   end
 
   def allowed_projects
-	Project.timesheet_order_by_name
-#    if User.current.admin? && Setting.plugin_timesheet_plugin['project_status'] == 'all'
-#      Project.timesheet_order_by_name
-#    elsif Setting.plugin_timesheet_plugin['project_status'] == 'all'
-#      Project.timesheet_order_by_name.timesheet_with_membership(User.current)
-#    else
-#      Project.timesheet_order_by_name.all(:conditions => Project.visible_condition(User.current))
-#    end
+    if User.current.admin? && Setting.plugin_timesheet_plugin['project_status'] == 'all'
+      Project.timesheet_order_by_name
+    elsif Setting.plugin_timesheet_plugin['project_status'] == 'all'
+      Project.timesheet_order_by_name.timesheet_with_membership(User.current)
+    else
+      Project.timesheet_order_by_name.all(:conditions => Project.visible_condition(User.current))
+    end
   end
 
   def clear_filters_from_session
