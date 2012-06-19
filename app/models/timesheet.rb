@@ -16,7 +16,7 @@ class Timesheet
   ValidSortOptions = {
     :project => 'Project',
     :user => 'User',
-    :issue => 'Issue'
+  #  :issue => 'Issue'
   }
 
   ValidPeriodType = {

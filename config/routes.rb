@@ -2,7 +2,7 @@ if Rails::VERSION::MAJOR >= 3
   RedmineApp::Application.routes.draw do
     match '/timesheet/report', :to => 'timesheet#report', :via =>:get
     match '/timesheet/report', :to => 'timesheet#report', :via =>:post
-    match '/timesheet/context_menu', :to => 'timesheet#context_menu', :via =>:get 
+    match '/timesheet/context_menu', :to => 'timesheet#context_menu', :via =>:get  
     match '/timesheet/reset', :to => 'timesheet#reset', :via =>:delete , :format => false 
     match '/timesheet/stop', :to => 'timesheet#stop', :via =>:get , :format => false
     match '/timesheet/start', :to => 'timesheet#start', :via =>:get , :format => false

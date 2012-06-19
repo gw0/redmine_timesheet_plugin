@@ -1,5 +1,4 @@
 require 'redmine'
-require 'dispatcher' unless Rails::VERSION::MAJOR >= 3
 
 # Taken from lib/redmine.rb
 if RUBY_VERSION < '1.9'
@@ -42,8 +41,7 @@ unless Redmine::Plugin.registered_plugins.keys.include?(:timesheet_plugin)
   end
 end
 
-if Rails::VERSION::MAJOR >= 3
-  ActionDispatch::Callbacks.to_prepare do
+ActionDispatch::Callbacks.to_prepare do
   require_dependency 'principal'
   require_dependency 'user'
   User.send(:include, TimesheetPlugin::Patches::UserPatch)
@@ -55,22 +53,5 @@ if Rails::VERSION::MAJOR >= 3
     require_dependency 'time_entry_activity'
   rescue LoadError
     # TimeEntryActivity is not available
-  end
-  end
-else
-  Dispatcher.to_prepare PreviewAttachColumn::PLUGIN_NAME do
-  require_dependency 'principal'
-  require_dependency 'user'
-  User.send(:include, TimesheetPlugin::Patches::UserPatch)
-
-  require_dependency 'project'
-  Project.send(:include, TimesheetPlugin::Patches::ProjectPatch)
-  # Needed for the compatibility check
-  begin
-    require_dependency 'time_entry_activity'
-  rescue LoadError
-    # TimeEntryActivity is not available
-  end
   end
 end
-
