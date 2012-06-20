@@ -55,3 +55,7 @@ If you need help you can contact the maintainer at his email address (See CREDIT
 === Bug tracker
 
 If you would like to report a bug or request a new feature the bug tracker is located at: https://projects.littlestreamsoftware.com/projects/redmine-timesheet
+
+=== Additional info
+
+This plugin will work on Redmine 2.0 with redmine_preview_attach_column plugin installed
