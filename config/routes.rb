@@ -13,4 +13,11 @@ if Rails::VERSION::MAJOR >= 3
     match '/timesheet/delete', :to => 'timesheet#delete', :via =>:get , :format => false
     match '/timesheet', :to => 'timesheet#index', :via =>:get , :format => false
   end
+else
+  ActionController::Routing::Routes.draw do |map|
+    map.connect 'timesheet/index', :controller => 'timesheet', :action => 'index'
+    map.connect 'timesheet/context_menu', :controller => 'timesheet', :action => 'context_menu'
+    map.connect 'timesheet/report.:format', :controller => 'timesheet', :action => 'report'
+    map.connect 'timesheet/reset', :controller => 'timesheet', :action => 'reset', :conditions => { :method => :delete }
+  end
 end
