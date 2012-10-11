@@ -1,6 +1,6 @@
 = Redmine Timesheet plugin
 
-A plugin to show and filter timelogs across all projects in Redmine. __Compatiable with ruby 1.8.7__
+A plugin to show and filter timelogs across all projects in Redmine. ((*Compatiable with ruby 1.8.7*))
 
 == Installation
 
