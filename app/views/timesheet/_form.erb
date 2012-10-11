@@ -1,6 +1,6 @@
 <div id="timesheet-form">
 <fieldset>
-<%= form_for (:timesheet), :url =>{:action => 'report'} do |f|  %>
+<%= form_for ((:timesheet), :url => {:action => 'report'}) do |f|  %>
 
 <p id="date-options">
   <label><%= l(:label_date)%>:</label><br />
@@ -41,7 +41,7 @@
   <%= select_tag 'timesheet[users][]', user_options(@timesheet), { :multiple => true, :size => @list_size} %>
 </p>
 
-<% 
+<%
 project=Project.new
 project.custom_field_values = @timesheet.project_custom_field_values unless @timesheet.project_custom_field_values.empty?
 project.custom_field_values.each do |value| %>
