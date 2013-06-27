@@ -1,10 +1,8 @@
 = Redmine Timesheet plugin
 
-A plugin to show and filter timelogs across all projects in Redmine. <b>Compatiable with ruby 1.8.7</b>
+A plugin to show and filter timelogs across all projects in Redmine. <b>Also contains support for sending reports to email.</b>
 
-== Installation
-
-Clone this plugin to the plugins directory. Install (redmine_preview_attach_column)[http://www.redmine.org/plugins/redmine_preview_attach_column]
+This plugin is a fork of {GitHub repository}[https://github.com/edavis10/redmine-timesheet-plugin] by Eric Davis. It has been updated to be compatible with Ruby 1.8.7+ and Redmine 2.2+.
 
 == Features
 
@@ -26,25 +24,20 @@ Clone this plugin to the plugins directory. Install (redmine_preview_attach_colu
 
 == Getting the plugin
 
-A copy of the released version can be downloaded from {Little Stream Software}[https://projects.littlestreamsoftware.com/projects/redmine-timesheet/files].  A development copy can be gotton from {GitHub}[http://github.com/edavis10/redmine-timesheet-plugin/tree/master]
+Get development copy from {GitHub repository}[https://github.com/gw0/redmine_timesheet_plugin]
 
 == Installation and Setup
 
-1. Follow the Redmine plugin installation steps at: http://www.redmine.org/wiki/redmine/Plugins Make sure the plugin is installed to +vendor/plugins/timesheet_plugin+
-2. Restart your Redmine web servers (e.g. mongrel, thin, mod_rails)
-3. Login and click the Timesheet Link in the top left menu
+Clone this plugin to the plugins directory. 
 
-== Upgrade
+1. Follow the Redmine plugin installation steps at: http://www.redmine.org/wiki/redmine/Plugins Make sure the plugin is installed to +plugins/redmine_timesheet_plugin+
+2. Optionally install (redmine_preview_attach_column)[http://www.redmine.org/plugins/redmine_preview_attach_column]
+3. Restart your Redmine web servers (e.g. mongrel, thin, mod_rails)
+4. Login and click the Timesheet Link in the top left menu
 
-=== Zip or tar files
+== Upgrade via Git
 
-1. Download the latest file as described in Getting the plugin
-2. Extract the file to your Redmine into vendor/plugins
-3. Restart your Redmine
-
-=== Git
-
-1. Open a shell to your Redmine's vendor/plugins/timesheet_plugin folder
+1. Open a shell to your Redmine's plugins/redmine_timesheet_plugin folder
 2. Update your Git copy with `git pull`
 3. Restart your Redmine
 
