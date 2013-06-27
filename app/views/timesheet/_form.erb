@@ -1,6 +1,6 @@
 <div id="timesheet-form">
 <fieldset>
-<%= form_for ((:timesheet), :url => {:action => 'report'}) do |f|  %>
+<%= form_for :timesheet, :url => {:action => 'report'} do |f|  %>
 
 <p id="date-options">
   <label><%= l(:label_date)%>:</label><br />
@@ -67,6 +67,7 @@ unless value.custom_field.name == 'Worklog'
 
 <div class="clear"></div>
 <%= submit_tag l(:button_apply),:class => 'button-small' -%>
+<%= submit_tag 'Send to email', :name => 'send_mail', :class => 'button-small' -%>
 
 <% end %>
 <%= button_to(l(:button_reset), {:controller => 'timesheet', :action => 'reset'}, :method => 'delete') %>

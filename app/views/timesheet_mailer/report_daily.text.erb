@@ -1,0 +1,18 @@
+<% @timesheet.time_entries.each do |entryname,entry| -%>
+
+Name: <% if entryname == @user.firstname %><%= @user.firstname %> <%= @user.lastname %><% else %><%= h entryname %><% end %>
+Date: <%= @timesheet.date_from %><% if @timesheet.date_from != @timesheet.date_to %> - <%= @timesheet.date_to %><% end %>
+Time: <%= h number_with_precision(@total[entryname], :precision=>@precision) %> <%= h(l(:field_hours)) %>
+-------------------------
+
+Completed:
+<%= render :partial => "time_entry", :collection => entry[:logs].select { |e| !e.issue || e.issue.status.is_closed } %>
+Active:
+<%= render :partial => "time_entry", :collection => entry[:logs].select { |e| e.issue && !e.issue.status.is_closed } %>
+Challenges:
+- 
+
+Lessons learned:
+- 
+
+<% end %>

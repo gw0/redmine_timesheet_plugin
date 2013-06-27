@@ -90,6 +90,10 @@ class TimesheetController < ApplicationController
 
     @grand_total = @total.collect{|k,v| v}.inject{|sum,n| sum + n}
 
+    if params['send_mail']
+      TimesheetMailer.report_daily(User.current, @timesheet, @total).deliver
+    end
+
     respond_to do |format|
       format.html { render :action => 'details', :layout => false if request.xhr? }
       format.csv  { send_data @timesheet.to_csv, :filename => 'timesheet.csv', :type => "text/csv" }

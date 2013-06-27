@@ -1,0 +1,4 @@
+- <%- if time_entry.issue -%><% status_name = time_entry.issue.status.name -%><% tracker_name = time_entry.issue.tracker.name -%><% if tracker_name == 'Meeting' %>Meeting <% end %><%= time_entry.issue.subject %><%= '.' if time_entry.issue.subject[-1] != '.' %> <%= h time_entry.comments -%>
+<%- else -%><% status_name = 'Log' -%><% tracker_name = time_entry.activity.name -%><%= h time_entry.comments -%> 
+<%- end -%>
+ [WT: <%= number_with_precision(time_entry.hours, :precision =>@precision) %>] [<%= status_name %>, <%= tracker_name %>, <%= time_entry.project.name %>]

@@ -46,7 +46,7 @@ class Timesheet
     end
 
     unless options[:users].nil?
-      self.users = options[:users].collect { |u| u.to_i }
+      self.users = options[:users].collect { |u| (u == 'me' ? User.current.id : u.to_i) }
     else
       self.users = Timesheet.viewable_users.collect {|user| user.id.to_i }
     end
